@@ -1,0 +1,31 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  bowler: 1
+  batsman: 1
+  over_id: 1
+  match_id: 1
+  delivery: 1
+  four: false
+  six: false
+  runs: 1
+  wicket: false
+  catcher: 1
+  done: false
+  declared: false
+  out: MyString
+
+two:
+  bowler: 1
+  batsman: 1
+  over_id: 1
+  match_id: 1
+  delivery: 1
+  four: false
+  six: false
+  runs: 1
+  wicket: false
+  catcher: 1
+  done: false
+  declared: false
+  out: MyString

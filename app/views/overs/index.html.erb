@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Overs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Match</th>
+      <th>Number</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @overs.each do |over| %>
+      <tr>
+        <td><%= over.match_id %></td>
+        <td><%= over.number %></td>
+        <td><%= link_to 'Show', over %></td>
+        <td><%= link_to 'Edit', edit_over_path(over) %></td>
+        <td><%= link_to 'Destroy', over, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Over', new_over_path %>

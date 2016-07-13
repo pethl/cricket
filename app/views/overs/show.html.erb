@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Match:</strong>
+  <%= @over.match_id %>
+</p>
+
+<p>
+  <strong>Number:</strong>
+  <%= @over.number %>
+</p>
+
+<%= link_to 'Edit', edit_over_path(@over) %> |
+<%= link_to 'Back', overs_path %>

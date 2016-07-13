@@ -1,0 +1,25 @@
+<%= form_for(@over) do |f| %>
+  <% if @over.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@over.errors.count, "error") %> prohibited this over from being saved:</h2>
+
+      <ul>
+      <% @over.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :match_id %><br>
+    <%= f.number_field :match_id %>
+  </div>
+  <div class="field">
+    <%= f.label :number %><br>
+    <%= f.number_field :number %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,42 @@
+<p id="notice"><%= notice %></p>
+<div class="row">
+  <div class="col-md-4">
+  
+  <table class="table">
+   <tr><td colspan=2> <strong><%= match_name(@ball.match_id) %></strong></td></tr>
+ 
+  <tr>
+  <td> <strong>Over:</strong>
+    <%= @ball.over_id %></td>
+  <td> <strong>Delivery:</strong>
+    <%= @ball.delivery %></td></tr>
+ 
+  <tr>
+  <td><b>Bowled:</b><br><%= player_name(@ball.bowler) %></td>
+  <td><b>In Bat:</b><br><%= player_name(@ball.batsman) %></td></tr>
+  <tr></tr>
+  
+  <tr>
+  <td><b>Runs:</b><br><%= @ball.runs %></td>
+  <td></td></tr>
+  <tr></tr>
+ 
+  
+  <tr>
+  <td><b>Wicket Taken:</b><br><%= @ball.out %></td>
+  <td><b>Caught By:</b><br><%= player_name(@ball.catcher) %></td></tr>
+  <tr></tr>
+  <tr>
+  <td><b>Declared:</b><br><%= @ball.declared %></td>
+  <td></td></tr>
+  <tr></tr>
+  </table>
+  
+  
+  </div>
+</div>
+
+
+<%= link_to 'Edit', edit_ball_path(@ball) %> |
+<%= link_to 'Back', balls_path %> | 
+<%= link_to 'Scoreboard', scoreboard_match_path(@ball.match_id) %>

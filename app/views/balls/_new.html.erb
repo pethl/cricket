@@ -1,0 +1,41 @@
+<%= form_for(@ball) do |f| %>
+  <% if @ball.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@ball.errors.count, "error") %> prohibited this ball from being saved:</h2>
+
+      <ul>
+      <% @ball.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <table class="table">
+  <tr><td>
+  
+  <table class="table-condensed" style="border: 0; text-align:left; background-color: transparent">
+  <tr><td style="width: 25%"></td><td style="width: 65%"></td><td style="width: 5%"></td></tr>
+ <tr><td>Bowler</td><td colspan=2><%= f.collection_select :bowler, Player.all, :id, :name_by_team, {:prompt => 'Please select bowler'}, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
+ <tr><td>Batsman</td><td colspan=2><%= f.collection_select :batsman, Player.all, :id, :name_by_team, {:prompt => 'Please select batsman'}, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
+ <tr><td>Runs</td><td><%= f.select :runs, options_for_select([["enter runs ",], 0,1,2,3,5], f.object.delivery), :style => "width: 220px;", class:"form-control input-sm" %>Four: <%= f.check_box :four%>Six <%= f.check_box :six%></td><td></td></tr>
+ <tr><td>Wicket?</td><td> <%= f.check_box :wicket, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
+ <tr><td>Out Type?</td><td> <%= f.select :out, ['C', 'CB', 'LBW', 'RO'], {:prompt => 'Please select out type'}, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
+ <tr><td>Caught By?</td><td><%= f.collection_select :catcher, Player.all, :id, :name_by_team, {:prompt => 'Please select caught by'}, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
+ <tr><td>Match Declared?</td><td><%= f.check_box :declared, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
+ 
+ <tr><td></td><td>
+  <%= f.hidden_field :match_id, :value => @match.id %>
+   <%= f.hidden_field :over_id, :value => latest_over(@match).id %>
+     <div class="actions">
+      <%= f.submit "Done", class: "btn btn-success btn-sm" %>
+     </div>
+  <% end %>
+  </td><td></td></tr>
+  </table>
+
+  </td>
+  </tr>
+  </table>
+  
+ 
+ 

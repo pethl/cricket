@@ -1,0 +1,58 @@
+<p id="notice"><%= notice %></p>
+
+<h4>
+ 
+  <%= @match.date.strftime('%A, %d %B %Y') %>
+</h4>
+
+<h3>
+  <%= team_full_name(@match.home) %> v.s.
+  <%= team_full_name(@match.away) %>
+</h3>
+
+<p>
+  <strong>Format:</strong>
+  <%= @match.total_overs %> overs<br>
+  <%= link_to 'See Scoreboard', scoreboard_match_path(@match.id) %></td>
+</p>
+
+
+<div class="row">
+  <div class="col-md-3">
+  <div class="well">
+  <b><ins><%= team_name(@match.home) %></ins></b>
+  <ul>
+  <% get_hometeam_by_match(@match).each do |player| %>
+  <li><%= player_name(player) %></li>
+  <% end %>
+  </ul>
+  </div></div>
+
+
+  <div class="col-md-3">
+  <div class="well">
+  <b><ins><%= team_name(@match.away) %></ins></b>
+  <ul>
+  <% get_awayteam_by_match(@match).each do |player| %>
+  <li><%= player_name(player) %></li>
+  <% end %>
+  </ul>
+  </div></div>
+  
+  <div class="col-md-3">
+  <div class="well">
+  <b><ins>Overs</ins></b>
+  <ul>
+  <% (@match.overs).each do |over| %>
+  <li><%= over.number %> [<%= over.balls.count %>]: 
+  <% over.balls.each do |ball|%>
+    <%= ball.runs %> | 
+     <% end %>
+  </li>
+  <% end %>
+  </ul>
+  </div></div>
+  
+ </div>
+<%= link_to 'Edit', edit_match_path(@match) %> |
+<%= link_to 'Back', matches_path %>

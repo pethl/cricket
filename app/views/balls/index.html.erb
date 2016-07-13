@@ -1,0 +1,51 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Balls</h1>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Bowler</th>
+      <th>Batsman</th>
+      <th>Over</th>
+      <th>Match</th>
+      <th>Delivery</th>
+      <th>Four</th>
+      <th>Six</th>
+      <th>Runs</th>
+      <th>Wicket</th>
+      <th>Catcher</th>
+      <th>Done</th>
+      <th>Declared</th>
+      <th>Out</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @balls.each do |ball| %>
+      <tr>
+        <td><%= ball.bowler %></td>
+        <td><%= ball.batsman %></td>
+        <td><%= ball.over_id %></td>
+        <td><%= ball.match_id %></td>
+        <td><%= ball.delivery %></td>
+        <td><%= ball.four %></td>
+        <td><%= ball.six %></td>
+        <td><%= ball.runs %></td>
+        <td><%= ball.wicket %></td>
+        <td><%= ball.catcher %></td>
+        <td><%= ball.done %></td>
+        <td><%= ball.declared %></td>
+        <td><%= ball.out %></td>
+        <td><%= link_to 'Show', ball %></td>
+        <td><%= link_to 'Edit', edit_ball_path(ball) %></td>
+        <td><%= link_to 'Destroy', ball, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Ball', new_ball_path %>
