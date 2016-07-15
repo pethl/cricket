@@ -27,10 +27,7 @@
     <%= f.label :overs %><br>
     <%= f.number_field :total_overs, min: 1, max: 100  %>
   </div>
-  <div class="field">
-    <%= f.label :over_count %><br>
-    <%= f.number_field :over_count, :disabled=>true, min: 1, max: 100  %>
-  </div>
+ 
   <div class="field">
     <%= f.label :first_to_bat %><br>
     <%= f.collection_select :first_to_bat, Team.all, :id, :full_name, {:prompt => 'Please select team to bat first'} %>

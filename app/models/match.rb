@@ -1,6 +1,6 @@
 class Match < ActiveRecord::Base
   has_many :overs
-  has_many :balls
+  has_many :balls, through: :overs
   accepts_nested_attributes_for :overs
   accepts_nested_attributes_for :balls
   
@@ -15,4 +15,5 @@ class Match < ActiveRecord::Base
      away = Team.find(self.away).very_short_name
        "#{(home)} v.s #{away}"
     end
+
 end

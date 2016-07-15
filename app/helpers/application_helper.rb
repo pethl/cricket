@@ -44,10 +44,25 @@ end
   end
 
   def latest_over(match_id)
-    if match_id.blank? 
-      
+    if match_id.blank?    
       else
    Over.where(match_id: match_id).order( 'number DESC' ).first
+   end
+  end
+  
+  def latest_ball(match)
+    if match.blank?    
+      else
+        over = latest_over(match)
+   Ball.where(over_id: over, match_id: match).last
+   end
+  end
+  
+  def latest_ball_done(match)
+    if match.blank?    
+      else
+        over = latest_over(match)
+   Ball.where(over_id: over, match_id: match, done: true).last
    end
   end
   
@@ -70,7 +85,7 @@ end
   #returns the last ball of an over not yet marked done from match
   #duplicated in match controller
   def match_incomplete_balls_per_over(match_id)
-    if over_id.blank? 
+    if match_id.blank? 
       else
         over_id = latest_over(match_id)
    Ball.where(over_id: over_id).where("done = 'f' OR done IS NULL")
@@ -87,14 +102,18 @@ end
   def runs_scored_per_batsman(player_id, match_id)
     if match_id.blank? 
       else
-      Ball.where(match_id: match_id, batsman: player_id).pluck(:runs).sum
+         if Ball.where(match_id: match_id, batsman: player_id).any?
+      Ball.where(match_id: match_id, batsman: player_id, done: true).pluck(:runs).sum
+      end
    end
   end
   
   def runs_scored_per_bowler(player_id, match_id)
     if match_id.blank? 
       else
-      Ball.where(match_id: match_id, bowler: player_id).pluck(:runs).sum
+        if Ball.where(match_id: match_id, bowler: player_id).any?
+      Ball.where(match_id: match_id, bowler: player_id, done: true).pluck(:runs).sum
+    end
    end
   end
   
@@ -102,7 +121,7 @@ end
     if match_id.blank? 
       else
         if Ball.where(match_id: match_id, batsman: player_id, wicket: true).any?
-          Ball.where(match_id: match_id, batsman: player_id, wicket: true).first.out
+          Ball.where(match_id: match_id, batsman: player_id, wicket: true, done: true).first.out
         else
           "-"
         end
@@ -153,8 +172,12 @@ end
     if match_id.blank? 
       else
         away_team_ids = get_awayteam_by_match(match_id)
-      Ball.where("batsman IN (?)", away_team_ids).where(match_id: match_id).pluck(:runs).sum
+      Ball.where("batsman IN (?)", away_team_ids).where(match_id: match_id, done: true).pluck(:runs).sum
    end
+  end
+  
+  def end_of_match(match)   
+  (latest_over(match).number == match.total_overs) && (latest_ball_done(match).delivery==6)
   end
   
   #TOO HARD NOT DONE THIS YET
@@ -166,7 +189,7 @@ end
   end
   
   def get_first_batsman_from_match(match_id)
-    Match.find(match_id).firat.first_to_bat
+    Match.find(match_id).first.first_to_bat
   end
   
 end
