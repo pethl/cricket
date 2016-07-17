@@ -51,6 +51,10 @@
   </li>
   <% end %>
   </ul>
+  <hr>
+  <% if check_balls_have_bowlers(@match.id) %>
+  <%= link_to 'Complete missing bowler information for record', edit_ball_path(get_balls_with_no_bowlers(@match.id).first.id) %>
+  <% end %>
   </div></div>
   
  </div>

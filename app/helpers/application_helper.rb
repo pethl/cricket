@@ -1,5 +1,12 @@
 module ApplicationHelper
   
+  def match_name(match_id)
+    if match_id.blank? 
+      else
+    Match.find(match_id).match_name
+    end
+  end
+  
   def team_full_name(team_id)
     if team_id.blank? 
       else
@@ -14,13 +21,6 @@ module ApplicationHelper
   end
 end
 
-  def match_name(match_id)
-    if match_id.blank? 
-      else
-    Match.find(match_id).match_name
-    end
-  end
-  
   def player_name(player_id)
     if player_id.blank? 
       else
@@ -92,6 +92,7 @@ end
    end
   end
   
+  #THIS HAS AN ERROR - NEEDS TO BE BY TEAM
   def wickets_per_match(match_id)
     if match_id.blank? 
       else
@@ -104,6 +105,8 @@ end
       else
          if Ball.where(match_id: match_id, batsman: player_id).any?
       Ball.where(match_id: match_id, batsman: player_id, done: true).pluck(:runs).sum
+    else
+      0
       end
    end
   end
@@ -156,6 +159,29 @@ end
    end
   end
   
+  def get_first_team_to_bat_by_match(match_id)
+    if match_id.blank?  
+      else
+         team_id = Match.find(match_id).first_to_bat
+      Matchteam.where(match_id: match_id, team_id: team_id).pluck(:player_id)
+   end
+  end
+  
+  def get_second_team_to_bat_by_match(match_id)
+    if match_id.blank? 
+      else
+        match = Match.find(match_id)
+        if match.home == match.first_to_bat
+          second_team = match.away
+        else
+          second_team = match.home
+        end
+      Matchteam.where(match_id: match_id, team_id: second_team).pluck(:player_id)
+   end
+  end
+  
+  
+  
   def get_runs_batted_by_hometeam_by_match(match_id)
     if match_id.blank? 
       else
@@ -180,11 +206,54 @@ end
   (latest_over(match).number == match.total_overs) && (latest_ball_done(match).delivery==6)
   end
   
-  #TOO HARD NOT DONE THIS YET
-  def get_names_of_current_batsmen(match_id)
+  def get_wickets_lost_by_hometeam_by_match(match_id)
     if match_id.blank? 
       else
-      
+        home_team_ids = get_hometeam_by_match(match_id)
+        if Ball.where("batsman IN (?)", home_team_ids).count > 0
+      Ball.where("batsman IN (?)", home_team_ids).where(match_id: match_id, wicket: true).count
+    else
+      0
+    end
+   end
+  end
+  
+  def get_wickets_lost_by_awayteam_by_match(match_id)
+    if match_id.blank? 
+      else
+        away_team_ids = get_awayteam_by_match(match_id)
+        if Ball.where("batsman IN (?)", away_team_ids).count > 0
+          Ball.where("batsman IN (?)", away_team_ids).where(match_id: match_id, wicket: true).count
+    else
+      0
+    end
+   end
+  end
+  
+  def get_last_wicket(match_id)
+    Ball.where(match_id: match_id)
+  end
+  
+  def get_names_of_current_batsmen(match_id)
+    match = Match.find(match_id)
+    if match.first_to_bat.blank? 
+      else
+        #Get all balls where out or declared (declared, batsman not out but no longer batting)
+        wickets = Ball.where(match_id: match_id, wicket: true).pluck(:batsman)
+       # declared = Ball.where(match_id: match_id, declared: true).pluck(:batsman)
+       # out_batsman= wickets+declared
+        
+        #Get all batsmen in order
+        first_team = get_first_team_to_bat_by_match(match_id)
+        second_team = get_second_team_to_bat_by_match(match_id)
+        
+        remaining_batsmen_first= first_team-wickets
+        if remaining_batsmen_first.count < 2
+          remaining_batsmen_second= second_team-wickets
+          return remaining_batsmen_second[0,2]
+        else
+         return remaining_batsmen_first[0,2]
+       end
    end
   end
   
@@ -192,4 +261,47 @@ end
     Match.find(match_id).first.first_to_bat
   end
   
+  def check_balls_have_bowlers(match_id)
+    balls = Ball.where(match_id: match_id)
+    @error = 0
+    balls.each do |ball|
+      if ball.bowler.blank?
+        @error =1  
+     end
+   end
+    if @error == 1
+      true
+    else
+      false
+    end
+  end
+  
+  def get_balls_with_no_bowlers(match_id)
+    Ball.where(match_id: match_id, bowler: nil)
+  end
+  
+  def whose_in_bat(match)
+    latest_over = latest_over(match.id).number
+    total_overs = match.total_overs
+    second_half = (total_overs/2)+1
+    if latest_over <second_half
+      match.first_to_bat
+     else
+       if match.home == match.first_to_bat
+         match.away
+       else
+         second_team = match.home
+       end 
+     end
+  end
+  
+  def latest_wicket_for_team(match)  
+    last_wicket = Ball.where(match_id: match, wicket: true).order( 'id ASC' ).last
+    Rails.logger.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXX_last_wickets: #{last_wicket.inspect}")
+    batsman = last_wicket.batsman
+    ball_id =last_wicket.id
+    Rails.logger.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXX_wickets: #{last_wicket.inspect}")
+    return runs_to_last_wicket = Ball.where("match_id= ? AND id < ?", match, ball_id).order( 'id DESC' ).pluck(:runs).sum 
+  end
+    
 end

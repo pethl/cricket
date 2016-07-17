@@ -3,6 +3,8 @@ class Over < ActiveRecord::Base
   has_many :balls
   accepts_nested_attributes_for :balls,
     :allow_destroy => true
+    
+   validates_associated :balls  
   
   def self.create_first(match)
     match_id = match.id

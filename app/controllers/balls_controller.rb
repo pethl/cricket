@@ -54,7 +54,7 @@ class BallsController < ApplicationController
         format.html { redirect_to @ball, notice: 'Ball was successfully updated.' }
         format.json { render :show, status: :ok, location: @ball }
       else
-        format.html { render :edit }
+        format.html { render "matches/scoreboard"}
         format.json { render json: @ball.errors, status: :unprocessable_entity }
       end
     end

@@ -2,7 +2,7 @@ class Ball < ActiveRecord::Base
   belongs_to :over
   belongs_to :match
   before_save :ball_validation_rules 
-#  validates :bowler, :on => :update, presence: true
+# validates :bowler, :on => :update, presence: true
 #  validates :batsman, :on => :update, presence: true
   validates :match_id, presence: true
   validates :over_id, presence: true

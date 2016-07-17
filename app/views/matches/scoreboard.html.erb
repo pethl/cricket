@@ -1,16 +1,17 @@
 
 <div class="row">
   <div class="col-md-5"><h6 class="text-left"><%= Date.current.strftime('%A, %d %B %Y') %></h6></div>
-  <div class="col-md-6"><h6 class="text-right"><%= Time.now.strftime('%H:%M') %></h6></div>
+  <div class="col-md-2"><h6 class="text-center"><%= team_name(@match.first_to_bat) %> to bat first</div>
+  <div class="col-md-4"><h6 class="text-right"><%= Time.now.strftime('%H:%M') %></h6></div>
 </div>
 
 <div class="row">
 <div class="col-md-5"><h3 class="text-right"><%= team_name(@match.home) %></h3>
-<h5 class="text-right"><%= get_runs_batted_by_hometeam_by_match(@match) %> for <%= wickets_per_match(@match) %></h5>
+<h5 class="text-right"><%= get_runs_batted_by_hometeam_by_match(@match) %> for <%= get_wickets_lost_by_hometeam_by_match(@match) %></h5>
 </div>
 <div class="col-md-1"><h3 class="text-center">v.s.</div>
 <div class="col-md-5"><h3 class="text-left"><%= team_name(@match.away) %></h3>
-<h5 class="text-left"><%= get_runs_batted_by_awayteam_by_match(@match) %></h5>
+<h5 class="text-left"><%= get_runs_batted_by_awayteam_by_match(@match) %> for <%= get_wickets_lost_by_awayteam_by_match(@match) %></h5>
 </div>
 
 </div>
@@ -18,37 +19,47 @@
 <div class="row">
 <div class="col-md-3">
   <h4 class="text-center"><%= team_name(@match.home) %></h4>
-  <table class=table table-striped>
+  <table class=table table-striped style="table-layout:fixed">
   <thead>
   <tr>
-   <td></td>
-   <td><b>Name</td>
-   <td><b>Wkt</td>
-   <td class="text-right"><b>RF</td>
-   <td class="text-right"><b>RA</td>
+   
+   <td style="width: 42%"><b><small>Name</td>
+   <td class="text-right" style="width: 11%"><b><small>Out</td>
+   <td class="text-right" style="width: 11%"><b><small>RF</td>
+   <td style="width: 11%"><b><small>Wt</td>
+   <td class="text-right" style="width: 11%"><b><small>RA</td>
    </tr></thead>
   <tbody>
   <% get_hometeam_by_match(@match).each do |player| %>
-    <tr><td><small><%= player_batting_order(player,@match.id)%>.</small></td>
-    <td><small><%= player_name_abbrv(player) %></small></td>
-    <td class="text-center"><small><%=  out_per_batsman(player,@match.id)%></small></td>
+    <tr>
+    <td><small><%= player_batting_order(player,@match.id)%>. <%= player_name_abbrv(player) %></small></td>
+    <td class="text-right"><small><%= out_per_batsman(player,@match.id)%></small></td>
     <td class="text-right"><small><%= runs_scored_per_batsman(player, @match.id) %></small></td>
-    <td class="text-right"><small><%= runs_scored_per_bowler(player, @match.id) %></small></td></tr>
+    <td class="text-center"><small><%= out_per_bowler(player,@match.id)%></small></td>
+    <td class="text-right"><small><%= runs_scored_per_bowler(player, @match.id) %></small></td>
+    </tr>
   <% end %>
    </tbody>
   </table>
+  
   <hr>
+  
   <div class="well">
   <b><ins>Past Overs</ins></b>
-  <ul>
+  <ol>
   <% (@match.overs).each do |over| %>
-  <li><%= over.number %> [<%= over.balls.count %>]: 
-  <% over.balls.each do |ball|%>
-    <%= ball.runs %> | 
+  <li> | 
+    <% over.balls.each do |ball|%> 
+        <% if ball.wicket == false %>
+          <%= ball.runs %> | 
+        <% else %>
+          <b><font color=blue><%= ball.runs %></font></b> | 
+        <% end %>
      <% end %>
+     
   </li>
   <% end %>
-  </ul>
+  </ol>
   </div>
   </div>
   
@@ -60,12 +71,12 @@
     <hr WIDTH="60%" SIZE="6">
     
     <h4 class="text-center">Last Wicket: 
-    <b>[23]</b></h4>
+    <b><%= latest_wicket_for_team(@match) %></b></h4>
     
     <hr WIDTH="60%" SIZE="6">
     
-    <h4 class="text-center">[Jones, S]  - [55]</h4>
-    <h4 class="text-center">[Broad, S] - [2]</h4>
+    <h4 class="text-center"><%= player_name(get_names_of_current_batsmen(@match).first) %>  - <%= runs_scored_per_batsman(get_names_of_current_batsmen(@match).first,@match) %></h4>
+    <h4 class="text-center"><%= player_name(get_names_of_current_batsmen(@match).second) %> - <%= runs_scored_per_batsman(get_names_of_current_batsmen(@match).second,@match) %></h4>
     
     <hr SIZE="6">
     
@@ -95,7 +106,7 @@
      </tr>
      </tbody>
      </table>
-    <hr  SIZE="6">
+  
     
     <div class="well">
     
@@ -103,7 +114,10 @@
     <% if latest_over(@match).balls.any? %><%= latest_ball(@match).delivery.ordinalize %> ball of <% end %>
     
     <%= latest_over(@match).number.ordinalize %> over</ins></b><br>
-   
+    
+    <% if check_balls_have_bowlers(@match.id) %>
+    <h4><font color=red>Bowler name missing from previous record, click <%= link_to "here", @match %> to review and correct.</font></h4>
+    <% end %>
     
     <% if @match.first_to_bat.blank? %>
       
@@ -131,7 +145,8 @@
       END of MATCH
       
       <% else %>              
-     <%= form_for @match, :html => {:multipart => true} do |f| %>  
+     <%= form_for @match, :html => {:multipart => true} do |f| %> 
+      <p id="notice"><%= notice %></p>
        <% if @match.errors.any? %>
            <div class="alert alert-block">
                <ul>
@@ -159,16 +174,17 @@
        <tr><td>Match Declared?</td><td><%= balls.check_box :declared, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
        <%= balls.hidden_field :done, value: true %>
        <tr><td></td><td>
+       
            <div class="actions">
             <%= f.submit "Done", class: "btn btn-success btn-sm" %>
            </div>
+          
         </td></tr>
          <% end %>
         <% end %>
-        <% end %>
+        <% end %>    
         </table>
          <% end %>
-
       <% end %>
     </div>   </div>  
   

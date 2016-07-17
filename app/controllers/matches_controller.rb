@@ -101,27 +101,62 @@ class MatchesController < ApplicationController
       
       if over.balls.any?
       ball = Ball.where(over_id: over, match_id: match_id).last
-       
-       if ball.delivery < 6
-         @ball = Ball.create(bowler: ball.bowler, batsman: ball.batsman, over_id: ball.over_id, match_id: ball.match_id, delivery: ball.delivery+1)
-         @ball.save
-       elsif over.number < match.total_overs
-         @over = Over.create(match_id: match.id, number: over.number+1)
-         @over.save
-         @ball = Ball.create(bowler: ball.bowler, batsman: ball.batsman, over_id: @over.id, match_id: ball.match_id, delivery: 1)
-         @ball.save
-       else
-       end
+     
+      #CREATE INITIAL BALL
+      @ball = Ball.create(bowler: ball.bowler, match_id: ball.match_id)
+       Rails.logger.debug("new_ball_object_first : #{@ball.inspect}")
       
-      else
+       #UPDATE DELIVERY AND OVER ID
+      if ball.delivery < 6 
+      @ball[:delivery] = ball.delivery+1
+      @ball[:over_id] = ball.over_id
+       Rails.logger.debug("new_ball_object_with_delivery_and_same_over : #{@ball.inspect}")
+      
+      elsif over.number < match.total_overs
+       @over = Over.create(match_id: match.id, number: over.number+1)
+       @over.save
+       @ball[:delivery] = 1
+       @ball[:over_id] = @over.id
+        Rails.logger.debug("new_ball_object_with_delivery_and_new_over : #{@ball.inspect}")
+      end
         
+       #@ball = Ball.create(bowler: ball.bowler, batsman: ball.batsman, over_id: @over.id, match_id: ball.match_id, delivery: 1)
+       #UPDATE BATSMAN WHEN WICKET
+       
+       if [0,2,4,6].include? (ball.runs)
+         @ball[:batsman] = ball.batsman
+         Rails.logger.debug("new_ball_object_with_same_batsman : #{@ball.inspect}")
+        else
+          @ball[:batsman] = get_other_at_bat(match_id,ball.batsman)
+          Rails.logger.debug("new_ball_object_with_other_batsman : #{@ball.inspect}")
+       end
+       
+       if ball.wicket == true
+          @ball[:batsman] = get_next_at_bat(match_id, ball.batsman)
+         Rails.logger.debug("new_ball_object_new_batsman : #{@ball.inspect}")
+         else
+       end
+       @ball.save
+     
+      else
         @ball = Ball.create(match_id: match.id, over_id: over.id, delivery: 1)
         @ball[:batsman] = Matchteam.where(team_id: (Match.find(match).first_to_bat), match_id: (match)).first.player_id
-        Rails.logger.debug("new ball: #{@ball.inspect}")
         @ball.save
-        
      end
     end
     
+    def get_next_at_bat(match_id, current_batsman)
+      matchteam = Matchteam.where(match_id: match_id, player_id: current_batsman).second
+      Rails.logger.debug("matchteam : #{matchteam.inspect}")
+      next_at_bat = Matchteam.where(match_id: match_id, team_id: matchteam.team_id, batting_order: matchteam.batting_order+1).first.player_id
+      Rails.logger.debug("next_at_bat : #{next_at_bat}")
+    end
+    
+    def get_other_at_bat(match_id, current_batsman)
+      matchteam = Matchteam.where(match_id: match_id, player_id: current_batsman).first
+      Rails.logger.debug("matchteam : #{matchteam.inspect}")
+      next_at_bat = Matchteam.where(match_id: match_id, team_id: matchteam.team_id, batting_order: matchteam.batting_order+1).first.player_id
+      Rails.logger.debug("next_at_bat : #{next_at_bat}")
+    end
     
 end
