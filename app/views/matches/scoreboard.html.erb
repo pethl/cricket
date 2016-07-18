@@ -74,7 +74,7 @@
     <b><%= latest_wicket_for_team(@match) %></b></h4>
     
     <hr WIDTH="60%" SIZE="6">
-    
+   
     <h4 class="text-center"><%= player_name(get_names_of_current_batsmen(@match).first) %>  - <%= runs_scored_per_batsman(get_names_of_current_batsmen(@match).first,@match) %></h4>
     <h4 class="text-center"><%= player_name(get_names_of_current_batsmen(@match).second) %> - <%= runs_scored_per_batsman(get_names_of_current_batsmen(@match).second,@match) %></h4>
     
@@ -115,8 +115,9 @@
     
     <%= latest_over(@match).number.ordinalize %> over</ins></b><br>
     
-    <% if check_balls_have_bowlers(@match.id) %>
+    <% if check_balls_have_bowlers(@match.id)== true %>
     <h4><font color=red>Bowler name missing from previous record, click <%= link_to "here", @match %> to review and correct.</font></h4>
+    <% else %>
     <% end %>
     
     <% if @match.first_to_bat.blank? %>

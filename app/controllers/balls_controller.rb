@@ -6,7 +6,7 @@ class BallsController < ApplicationController
     @ball = Ball.new(ball_params)
     @ball[:batsman] = Matchteam.where(team_id: (Match.find(ball_params[:match_id]).first_to_bat), match_id: (ball_params[:match_id])).first.player_id
     @ball.save
-    redirect_to @ball, notice: 'Ball was successfully created.' 
+    redirect_to scoreboard_match_path(@ball.match_id), notice: 'Ball was successfully created.' 
   end
   
   # GET /balls

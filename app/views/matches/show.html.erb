@@ -32,25 +32,25 @@
   <div class="col-md-3">
   <div class="well">
   <b><ins><%= team_name(@match.away) %></ins></b>
-  <ul>
+  <ol>
   <% get_awayteam_by_match(@match).each do |player| %>
   <li><%= player_name(player) %></li>
   <% end %>
-  </ul>
+  </ol>
   </div></div>
   
   <div class="col-md-3">
   <div class="well">
   <b><ins>Overs</ins></b>
-  <ul>
+  <ol>
   <% (@match.overs).each do |over| %>
-  <li><%= over.number %> [<%= over.balls.count %>]: 
+  <li>|  
   <% over.balls.each do |ball|%>
     <%= ball.runs %> | 
      <% end %>
   </li>
   <% end %>
-  </ul>
+  </ol>
   <hr>
   <% if check_balls_have_bowlers(@match.id) %>
   <%= link_to 'Complete missing bowler information for record', edit_ball_path(get_balls_with_no_bowlers(@match.id).first.id) %>

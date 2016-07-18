@@ -69,6 +69,6 @@ class MatchteamsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def matchteam_params
-      params.require(:matchteam).permit(:match_id, :player_id, :out, :batting_order, :team_id)
+      params.require(:matchteam).permit(:match_id, :player_id, :is_out, :batting_order, :team_id)
     end
 end

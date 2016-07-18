@@ -24,7 +24,7 @@
    <%= f.collection_select :away, Team.all, :id, :full_name, {:prompt => 'Please select away team'} %>
   </div>
   <div class="field">
-    <%= f.label :overs %><br>
+    <%= f.label :overs, "Total overs" %><br>
     <%= f.number_field :total_overs, min: 1, max: 100  %>
   </div>
  
