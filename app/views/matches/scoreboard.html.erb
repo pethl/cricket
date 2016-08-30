@@ -1,16 +1,10 @@
 
 <div class="row">
-  <div class="col-md-5"><h6 class="text-left"><%= Date.current.strftime('%A, %d %B %Y') %></h6></div>
-  <div class="col-md-2"><h6 class="text-center"><%= team_name(@match.first_to_bat) %> to bat first</div>
-  <div class="col-md-4"><h6 class="text-right"><%= Time.now.strftime('%H:%M') %></h6></div>
-</div>
-
-<div class="row">
-<div class="col-md-5"><h3 class="text-right"><%= team_name(@match.home) %></h3>
+<div class="col-md-5"><h2 class="text-right"><%= team_name(@match.home) %></h2>
 <h5 class="text-right"><%= get_runs_batted_by_hometeam_by_match(@match) %> for <%= get_wickets_lost_by_hometeam_by_match(@match) %></h5>
 </div>
 <div class="col-md-1"><h3 class="text-center">v.s.</div>
-<div class="col-md-5"><h3 class="text-left"><%= team_name(@match.away) %></h3>
+<div class="col-md-5"><h2 class="text-left"><%= team_name(@match.away) %></h2>
 <h5 class="text-left"><%= get_runs_batted_by_awayteam_by_match(@match) %> for <%= get_wickets_lost_by_awayteam_by_match(@match) %></h5>
 </div>
 
@@ -23,7 +17,7 @@
   <thead>
   <tr>
    
-   <td style="width: 42%"><b><small>Name</td>
+   <td style="width: 54%"><b><small>Name</td>
    <td class="text-right" style="width: 11%"><b><small>Out</td>
    <td class="text-right" style="width: 11%"><b><small>RF</td>
    <td style="width: 11%"><b><small>Wt</td>
@@ -33,7 +27,7 @@
   <% get_hometeam_by_match(@match).each do |player| %>
     <tr>
     <td><small><%= player_batting_order(player,@match.id)%>. <%= player_name_abbrv(player) %></small></td>
-    <td class="text-right"><small><%= out_per_batsman(player,@match.id)%></small></td>
+    <td class="text-right"><small><b><font color=blue><%= out_per_batsman(player,@match.id)%></b></font></small></td>
     <td class="text-right"><small><%= runs_scored_per_batsman(player, @match.id) %></small></td>
     <td class="text-center"><small><%= out_per_bowler(player,@match.id)%></small></td>
     <td class="text-right"><small><%= runs_scored_per_bowler(player, @match.id) %></small></td>
@@ -67,6 +61,7 @@
   <br>
     <h4 class="text-center">Overs:
     <b><%= latest_over(@match).number.ordinalize %> of <%= @match.total_overs %></b></h4>
+    <h5 class="text-center"><small><%= team_name(@match.first_to_bat) %> first to bat</small></h6>
     
     <hr WIDTH="60%" SIZE="6">
     
@@ -110,10 +105,11 @@
     
     <div class="well">
     
-    <b><ins>Scoring for 
-    <% if latest_over(@match).balls.any? %><%= latest_ball(@match).delivery.ordinalize %> ball of <% end %>
+    <b>
+    <% if latest_over(@match).balls.any? %>
+     Match Ball Number: <%= latest_ball(@match).counter %> <% end %><br>
     
-    <%= latest_over(@match).number.ordinalize %> over</ins></b><br>
+    <%= latest_over(@match).number.ordinalize %> over</b><br>
     
     <% if check_balls_have_bowlers(@match.id)== true %>
     <h4><font color=red>Bowler name missing from previous record, click <%= link_to "here", @match %> to review and correct.</font></h4>
@@ -166,13 +162,14 @@
         
         <table class="table-condensed" style="border: 0; text-align:left; background-color: transparent">
        <tr><td style="width: 25%"></td><td style="width: 65%"></td></tr>
-       <tr><td>Bowler</td><td colspan=2><%= balls.collection_select :bowler, Player.all, :id, :name_by_team, {:prompt => 'Please select bowler'}, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
-       <tr><td>Batsman</td><td colspan=2><%= balls.collection_select :batsman, Player.all, :id, :name_by_team, {:prompt => 'Please select batsman'}, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
-       <tr><td>Runs</td><td><%= balls.select :runs, options_for_select(Ball.run_types, balls.object.runs), :style => "width: 220px;", class:"form-control input-sm" %>Four: <%= balls.check_box :four%>Six <%= balls.check_box :six%></td><td></td></tr>
-       <tr><td>Wicket?</td><td> <%= balls.check_box :wicket, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
-       <tr><td>Out Type?</td><td> <%= balls.select :out, options_for_select(Ball.out_types, balls.object.out), {:prompt => 'Please select out type'}, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
-       <tr><td>Caught By?</td><td><%= balls.collection_select :catcher, Player.all, :id, :name_by_team, {:prompt => 'Please select caught by'}, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
-       <tr><td>Match Declared?</td><td><%= balls.check_box :declared, :style => "width: 220px;", class:"form-control input-sm" %></td></tr>
+       <tr><td>Bowler</td><td colspan="2"><%= balls.collection_select :bowler, Player.all, :id, :name_by_team, {:prompt => 'Please select bowler'} %></td></tr>
+       <tr><td>Batsman</td><td colspan="2"><%= balls.collection_select :batsman, Player.all, :id, :name_by_team, {:prompt => 'Please select batsman'} %></td></tr>
+       <tr><td></td><td> No Ball <%= balls.check_box :no_ball, :style => "width: 50px;"%> Wide <%= balls.check_box :wide  %></td></tr>
+       <tr><td>Runs</td><td><%= balls.select :runs, options_for_select(Ball.run_types, balls.object.runs) %> Four <%= balls.check_box :four%> Six <%= balls.check_box :six%></td><td></td></tr>
+       <tr><td>Wicket?</td><td> <%= balls.check_box :wicket, :style => "width: 220px;"%></td></tr>
+       <tr><td>Out Type?</td><td> <%= balls.select :out, options_for_select(Ball.out_types, balls.object.out), {:prompt => 'Please select out type'}, :style => "width: 238px;" %></td></tr>
+       <tr><td>Fielder?</td><td><%= balls.collection_select :catcher, Player.all, :id, :name_by_team, {:prompt => 'Please select fielder involved'} %></td></tr>
+       <tr><td>Side Declared?</td><td><%= balls.check_box :declared%></td></tr>
        <%= balls.hidden_field :done, value: true %>
        <tr><td></td><td>
        
@@ -189,28 +186,54 @@
       <% end %>
     </div>   </div>  
   
-  <div class="col-md-3">
-    <h4 class="text-center"><%= team_name(@match.away) %> </h4>
-    <table class=table table-striped>
-    <thead>
-    <tr>
-     <td></td>
-     <td><b>Name</td>
-     <td><b>Wkt</td>
-     <td class="text-right"><b>RF</td>
-     <td class="text-right"><b>RA</td>
-     </tr></thead>
-    <tbody>
-    <% get_awayteam_by_match(@match).each do |player| %>
+    <div class="row">
+    <div class="col-md-3">
+      <h4 class="text-center"><%= team_name(@match.away) %></h4>
+      <table class=table table-striped style="table-layout:fixed">
+      <thead>
       <tr>
-      <td><small><%= player_batting_order(player,@match.id)%>.</small></td>
-      <td><small><%= player_name_abbrv(player) %></small></td>
-      <td class="text-center"><small><%=  out_per_batsman(player,@match.id)%></small></td>
-      <td class="text-right"><small><%= runs_scored_per_batsman(player, @match.id) %></small></td>
-      <td class="text-right"><small><%= runs_scored_per_bowler(player, @match.id) %></small></td></tr>
-    <% end %>
-     </tbody>
-    </table>
+   
+       <td style="width: 56%"><b><small>Name</td>
+       <td class="text-right" style="width: 11%"><b><small>Out</td>
+       <td class="text-right" style="width: 11%"><b><small>RF</td>
+       <td style="width: 11%"><b><small>Wt</td>
+       <td class="text-right" style="width: 11%"><b><small>RA</td>
+       </tr></thead>
+      <tbody>
+      <% get_awayteam_by_match(@match).each do |player| %>
+        <tr>
+        <td><small><%= player_batting_order(player,@match.id)%>. <%= player_name_abbrv(player) %></small></td>
+        <td class="text-right"><small><b><font color=blue><%= out_per_batsman(player,@match.id)%></font></b></small></td>
+        <td class="text-right"><small><%= runs_scored_per_batsman(player, @match.id) %></small></td>
+        <td class="text-center"><small><%= out_per_bowler(player,@match.id)%></small></td>
+        <td class="text-right"><small><%= runs_scored_per_bowler(player, @match.id) %></small></td>
+        </tr>
+      <% end %>
+       </tbody>
+      </table>
+      
+      <hr>
+      
+      <div class="well">
+      <% if (Ball.where(match_id: @match.id).count > 0)%>
+     <% if bowlers_per_team(@match).count > 0 %>
+       <table class="table">
+       <tr><th><b><ins>Bowlers</ins></b></th><th>Wkt</th><th class="text-right">RA</th><th class="text-right">Ovs</th></tr>
+       <tr>
+       <% bowlers_per_team(@match).each do |bowler| %>
+         
+         <td><%= player_name_abbrv(bowler) %></td>
+         <td class="text-right"><%= out_per_bowler(bowler, @match.id)%></td>
+         <td class="text-right"><%= runs_scored_per_bowler(bowler, @match.id)%></td>
+         <td class="text-right"><%= get_overs_bowled_by_bowler(bowler, @match.id)%></td>
+         </tr>
+         <% end %>
+         </table>
+         <% end %>
+            <% end %>
+      </div>
+      
     </div>    
+      </div>    
 </div>
 

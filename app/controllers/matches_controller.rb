@@ -1,14 +1,10 @@
 class MatchesController < ApplicationController
-  before_action :set_match, only: [:show, :edit, :update, :destroy]
+  before_action :set_match, only: [:show, :edit, :update, :destroy, :scoreboard]
 
  
 
  # GET /matches/1/edit
   def scoreboard
-    @match = Match.find(params[:id])
-   # @match.balls = Balls.where(match_id: match_id).where("done = 'f' OR done IS NULL")
-   # over = Over.where(match_id: params[:id]).order( 'number DESC' ).first
-  #  ball = match_incomplete_balls_per_over(params[:id], over.id)
   end
 
   # GET /matches
@@ -83,7 +79,7 @@ class MatchesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def match_params
-      params.require(:match).permit(:date, :home, :away, :total_overs, :over_count, :first_to_bat, overs_attributes: [:id, :number, balls_attributes:[:id, :match_id, :number, :bowler, :batsman, :over_id, :delivery, :four, :six, :runs, :wicket, :catcher, :done, :declared, :out]])
+      params.require(:match).permit(:date, :home, :away, :total_overs, :over_count, :first_to_bat, overs_attributes: [:id, :number, balls_attributes:[:id, :match_id, :number, :bowler, :batsman, :over_id, :delivery, :four, :six, :runs, :wicket, :catcher, :done, :declared, :out, :no_ball, :wide, :counter]])
     end
     
     #returns the last ball of an over not yet marked done from match
@@ -103,7 +99,7 @@ class MatchesController < ApplicationController
       ball = Ball.where(over_id: over, match_id: match_id).last
      
       #CREATE INITIAL BALL
-      @ball = Ball.create(bowler: ball.bowler, match_id: ball.match_id)
+      @ball = Ball.create(bowler: ball.bowler, match_id: ball.match_id, counter: 1)
        Rails.logger.debug("new_ball_object_first : #{@ball.inspect}")
       
        #UPDATE DELIVERY AND OVER ID
@@ -111,6 +107,7 @@ class MatchesController < ApplicationController
        @ball[:delivery] = ball.delivery+1
        @ball[:over_id] = ball.over_id
        @ball[:bowler] = ball.bowler
+       @ball[:counter] = (ball.counter.to_i+1)
        
       elsif over.number < match.total_overs
        @over = Over.create(match_id: match.id, number: over.number+1)
@@ -118,6 +115,7 @@ class MatchesController < ApplicationController
        @ball[:delivery] = 1
        @ball[:over_id] = @over.id
        @ball[:bowler] = ball.bowler
+       @ball[:counter] = ball.counter+1
       end
         
        #@ball = Ball.create(bowler: ball.bowler, batsman: ball.batsman, over_id: @over.id, match_id: ball.match_id, delivery: 1)

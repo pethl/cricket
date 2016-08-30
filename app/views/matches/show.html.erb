@@ -1,14 +1,13 @@
 <p id="notice"><%= notice %></p>
-
+<br>
 <h4>
- 
   <%= @match.date.strftime('%A, %d %B %Y') %>
 </h4>
 
-<h3>
+<h2>
   <%= team_full_name(@match.home) %> v.s.
   <%= team_full_name(@match.away) %>
-</h3>
+</h2>
 
 <p>
   <strong>Format:</strong>
@@ -18,7 +17,7 @@
 
 
 <div class="row">
-  <div class="col-md-3">
+  <div class="col-md-4">
   <div class="well">
   <b><ins><%= team_name(@match.home) %></ins></b>
   <ul>
@@ -29,7 +28,7 @@
   </div></div>
 
 
-  <div class="col-md-3">
+  <div class="col-md-4">
   <div class="well">
   <b><ins><%= team_name(@match.away) %></ins></b>
   <ol>
@@ -39,7 +38,7 @@
   </ol>
   </div></div>
   
-  <div class="col-md-3">
+  <div class="col-md-4">
   <div class="well">
   <b><ins>Overs</ins></b>
   <ol>

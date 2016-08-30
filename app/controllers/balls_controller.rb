@@ -78,7 +78,7 @@ class BallsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def ball_params
-      params.require(:ball).permit(:bowler, :batsman, :over_id, :match_id, :delivery, :four, :six, :runs, :wicket, :catcher, :done, :declared, :out)
+      params.require(:ball).permit(:bowler, :batsman, :over_id, :match_id, :delivery, :four, :six, :runs, :wicket, :catcher, :done, :declared, :out, :no_ball, :wide, :counter)
     end
     
    

@@ -43,6 +43,15 @@ end
   end
   end
 
+  # get the current over of a match
+  def over_number(over_id)
+    if over_id.blank?    
+      else
+   Over.where(id: over_id).first.number
+   end
+  end
+
+  # get the current over of a match
   def latest_over(match_id)
     if match_id.blank?    
       else
@@ -50,6 +59,7 @@ end
    end
   end
   
+   # get the current ball of the current over of a match - ball will be inplay - created not yet saved
   def latest_ball(match)
     if match.blank?    
       else
@@ -58,13 +68,13 @@ end
    end
   end
   
+  # get the last ball of the current over of a match, whether complete or incomplete
   def latest_ball_done(match)
     if match.blank?    
       else
         over = latest_over(match)
         if Ball.where(over_id: over.id, match_id: match.id, done: true).any?
    ball = Ball.where(over_id: over.id, match_id: match.id, done: true).last
-   Rails.logger.debug("latest_ball_done : #{ball}")
    return ball
  else
    Ball.where(over_id: over.id, match_id: match.id).last
@@ -80,7 +90,7 @@ end
    end
   end
   
-  #returns the last ball of an over not yet marked done
+  #returns the last ball of an over not yet marked done - last ball in play
   def incomplete_balls_per_over(over_id)
     if over_id.blank? 
       else
@@ -98,13 +108,6 @@ end
    end
   end
   
-  #THIS HAS AN ERROR - NEEDS TO BE BY TEAM
-  def wickets_per_match(match_id)
-    if match_id.blank? 
-      else
-   Ball.where(match_id: match_id, wicket: true).count
-   end
-  end
   
   def runs_scored_per_batsman(player_id, match_id)
     if match_id.blank? 
@@ -132,7 +135,7 @@ end
         if Ball.where(match_id: match_id, batsman: player_id, wicket: true).any?
           Ball.where(match_id: match_id, batsman: player_id, wicket: true, done: true).first.out
         else
-          "-"
+          
         end
    end
   end
@@ -165,6 +168,15 @@ end
    end
   end
   
+  def get_any_team_by_match(match_id,team_id)
+   
+    if match_id.blank? 
+      else
+      Matchteam.where(match_id: match_id, team_id: team_id).pluck(:player_id)
+   end
+  end
+  
+  # THIS MAY BE DUPLICATE AND UNNECESSARY as not what it says on tin
   def get_first_team_to_bat_by_match(match_id)
     if match_id.blank?  
       else
@@ -235,9 +247,7 @@ end
    end
   end
   
-  def get_last_wicket(match_id)
-    Ball.where(match_id: match_id)
-  end
+ 
   
   #WORK TO DO FOE DECLARED
   def get_names_of_current_batsmen(match_id)
@@ -306,22 +316,55 @@ end
      end
   end
   
+  def whose_bowling(match)
+    latest_over = latest_over(match.id).number
+    total_overs = match.total_overs
+    second_half = (total_overs/2)+1
+    if latest_over < second_half
+      if match.home == match.first_to_bat
+        match.away
+      else
+        second_team = match.home
+      end 
+     else
+       match.first_to_bat
+     end
+  end
+  
   def latest_wicket_for_team(match)  
     
     if Ball.where(match_id: match, wicket: true, ).any?
       
     last_wicket = Ball.where(match_id: match, wicket: true).order( 'id ASC' ).last
-    Rails.logger.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXX_last_wickets: #{last_wicket.inspect}")
-    
     batsman = last_wicket.batsman
-    
-    
     ball_id =last_wicket.id
-    Rails.logger.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXX_wickets: #{last_wicket.inspect}")
     return runs_to_last_wicket = Ball.where("match_id= ? AND id < ?", match, ball_id).order( 'id DESC' ).pluck(:runs).sum
   else
     '-'
   end 
+  end
+  
+  def bowlers_per_team(match_id)
+    team_id = whose_bowling(match_id)
+    team = get_any_team_by_match(match_id, team_id)
+    bowlers = Ball.where(match_id: match_id).where("bowler IN (?)", team).pluck(:bowler)
+    return bowlers.uniq
+  end
+  
+  def get_overs_bowled_by_bowler(bowler, match_id)
+    balls = Ball.where(match_id: match_id, bowler: bowler, done: true).count
+    #, no_ball: false, wide: false
+    
+    overcount = 0
+    unless balls < 6
+      if balls - 6 >0
+        overcount = overcount +1
+        balls = balls-6
+      else
+      end 
+    end
+    
+    return overcount.to_s + "." + balls.to_s
   end
     
 end

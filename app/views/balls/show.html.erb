@@ -7,14 +7,19 @@
  
   <tr>
   <td> <strong>Over:</strong>
-    <%= @ball.over_id %></td>
-  <td> <strong>Delivery:</strong>
-    <%= @ball.delivery %></td></tr>
+    <%= over_number(@ball.over_id) %></td>
+  
+  <td> <strong>Match Ball Count:</strong>
+    <%= @ball.counter %></td></tr>
  
   <tr>
   <td><b>Bowled:</b><br><%= player_name(@ball.bowler) %></td>
   <td><b>In Bat:</b><br><%= player_name(@ball.batsman) %></td></tr>
   <tr></tr>
+  
+  <tr>
+  <td><b>No Ball:</b><br><%= @ball.no_ball %></td>
+  <td><b>Wide:</b><br><%= @ball.wide %></td></tr>
   
   <tr>
   <td><b>Runs:</b><br><%= @ball.runs %></td>
@@ -24,7 +29,7 @@
   
   <tr>
   <td><b>Wicket Taken:</b><br><%= @ball.out %></td>
-  <td><b>Caught By:</b><br><%= player_name(@ball.catcher) %></td></tr>
+  <td><b>Fielder:</b><br><%= player_name(@ball.catcher) %></td></tr>
   <tr></tr>
   <tr>
   <td><b>Declared:</b><br><%= @ball.declared %></td>

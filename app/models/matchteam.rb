@@ -7,8 +7,8 @@ class Matchteam < ActiveRecord::Base
     match_id = match.id
     hometeam_id = match.home
     awayteam_id = match.away
-    homeplayers = Player.where(team_id: hometeam_id).pluck(:id)
-    awayplayers = Player.where(team_id: awayteam_id).pluck(:id)
+    homeplayers = Player.where(team_id: hometeam_id).pluck(:id).sort
+    awayplayers = Player.where(team_id: awayteam_id).pluck(:id).sort
     
     i = 0
     while i < homeplayers.count 
